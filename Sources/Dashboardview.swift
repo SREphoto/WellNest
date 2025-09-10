@@ -1,4 +1,3 @@
-// Sources/DashboardView.swift
 import SwiftUI
 
 struct DashboardView: View {
@@ -6,38 +5,59 @@ struct DashboardView: View {
     
     var body: some View {
         NavigationView {
-            List(circleManager.users) { user in
-                HStack {
-                    // Placeholder for Moodie icon
-                    Text(user.mood)
-                        .frame(width: 30, height: 30)
-                        .background(user.score > 50 ? Color.blue : Color.red)
-                        .clipShape(Circle())
-                    
-                    VStack(alignment: .leading) {
-                        Text(user.name)
-                            .font(.headline)
-                        if let status = user.status {
-                            Text(status)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
+            List {
+                ForEach(circleManager.users) { user in
+                    HStack(spacing: 15) {
+                        Image(systemName: user.moodIcon)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
+                            .foregroundColor(user.score > 50 ? .accentColor : .red)
+
+                        VStack(alignment: .leading) {
+                            Text(user.name)
+                                .font(.headline)
+                            if let status = user.status {
+                                Text(status)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
                         }
+
+                        Spacer()
+
+                        Button(action: {
+                            if let url = URL(string: "sms:123-456-7890&body=Thinking of you!") {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            Image(systemName: "message.fill")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.accentColor)
                     }
-                    
-                    Spacer()
-                    
-                    Button("Reach Out") {
-                        // Placeholder for communication
-                        print("Reaching out to \(user.name)")
-                    }
-                    .buttonStyle(.bordered)
-                    .foregroundColor(.blue)
+                    .padding()
+                    .background(user.score < 20 || user.status == "Help" ? Color.red.opacity(0.1) : Color(UIColor.systemBackground))
+                    .cornerRadius(10)
+                    .shadow(radius: 2)
                 }
-                .padding(.vertical, 5)
-                .background(user.score < 20 || user.status == "Help" ? Color.red.opacity(0.1) : Color.clear)
-                .cornerRadius(10)
+                .onDelete(perform: { indexSet in
+                    // Placeholder for deleting users
+                    print("Deleting users at \(indexSet)")
+                })
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("My Circle")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // Placeholder for adding a new user
+                        print("Add new user")
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
         }
     }
 }
