@@ -1,4 +1,3 @@
-// Sources/WatchView.swift
 import SwiftUI
 
 struct WatchView: View {
@@ -6,26 +5,24 @@ struct WatchView: View {
     
     var body: some View {
         ScrollView {
-            VStack {
-                Circle()
-                    .trim(from: 0.1, to: 0.9)
-                    .stroke(circleManager.calculateAverageScore() > 50 ? Color.blue : Color.red, lineWidth: 4)
-                    .frame(width: 50, height: 50)
-                    .rotationEffect(.degrees(90))
-                
+            VStack(spacing: 10) {
+                Text("Your Circle")
+                    .font(.headline)
+                    .padding(.top, 10)
+
                 ForEach(circleManager.users) { user in
                     HStack {
-                        Text(user.mood)
-                            .frame(width: 20, height: 20)
-                            .background(user.score > 50 ? Color.blue : Color.red)
-                            .clipShape(Circle())
+                        Image(systemName: user.moodIcon)
+                            .foregroundColor(user.score > 50 ? .blue : .red)
                         Text(user.name)
                             .font(.system(size: 14))
+                        Spacer()
                     }
-                    .padding(.vertical, 2)
+                    .padding(.horizontal)
                 }
             }
         }
+        .navigationTitle("WellNest")
     }
 }
 
