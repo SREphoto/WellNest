@@ -1,30 +1,30 @@
-import SwiftUI
+import Foundation
 
 struct User: Identifiable {
-    let id: String
-    let name: String
-    var mood: String // Can be "Joyful", "Sad", "Crisis"
-    var status: String?
-    var score: Int // 0-100
+    enum Status: String, Codable {
+        case active
+        case pendingVerification = "pending_verification"
+        case inactive
+        case deleted
+    }
 
-    var moodIcon: String {
-        switch mood {
-        case "Joyful":
-            return "person.crop.circle.fill.badge.plus"
-        case "Sad":
-            return "person.crop.circle.fill.badge.minus"
-        case "Crisis":
-            return "person.crop.circle.fill.badge.exclamationmark"
-        default:
-            return "person.crop.circle"
-        }
+    struct EmergencyContact: Codable {
+        let name: String
+        let phoneNumber: String
+        let relationship: String
     }
-    
-    init(id: String = UUID().uuidString, name: String, mood: String = "Neutral", status: String? = nil, score: Int = 50) {
-        self.id = id
-        self.name = name
-        self.mood = mood
-        self.status = status
-        self.score = score
-    }
+
+    let id: UUID
+    var email: String
+    var passwordHash: String
+    var salt: String
+    var fullName: String
+    var profilePictureUrl: URL?
+    let createdAt: Date
+    var updatedAt: Date
+    var lastLoginAt: Date?
+    var status: Status = .pendingVerification
+    var devicePushTokens: [String]?
+    var emergencyContactDetails: [EmergencyContact]?
+    var userAiProfileId: UUID?
 }
