@@ -11,15 +11,8 @@ class User {
         this.lastLoginAt = lastLoginAt;
         this.status = status;
         this.devicePushTokens = devicePushTokens;
-        this.emergencyContactDetails = []; // Initialize as an empty array
+        this.emergencyContactDetails = emergencyContactDetails;
         this.userAiProfileId = userAiProfileId;
-
-        // Default privacy settings for a new user
-        this.privacySettings = {
-            profileVisibility: 'CONNECTIONS_ONLY', // Valid values: 'ALL_CONNECTIONS', 'CONNECTIONS_ONLY', 'PRIVATE'
-            showEmail: false,
-            showBio: true
-        };
     }
 }
 
