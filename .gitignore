@@ -1,5 +1,1 @@
-# Swift
-.build/
-*.xcodeproj/
-*.xcworkspace/
-.DS_Store
+node_modules/
