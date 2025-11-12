@@ -59,7 +59,7 @@ app.post('/auth/register', (req, res) => {
         passwordHash,
         salt,
         fullName,
-        null, null, null, 'pending_verification', null, null, null
+        null, null, null, 'pending_verification', null, [], null
     );
 
     users.push(newUser);
@@ -113,18 +113,42 @@ app.put('/users/me/profile/privacy-settings', authenticateToken, (req, res) => {
     if (user) {
         const { profileVisibility, showEmail, showBio } = req.body;
 
-        // Update only the settings that are provided in the request
-        if (profileVisibility !== undefined) {
-            user.privacySettings.profileVisibility = profileVisibility;
-        }
-        if (showEmail !== undefined) {
-            user.privacySettings.showEmail = showEmail;
-        }
-        if (showBio !== undefined) {
-            user.privacySettings.showBio = showBio;
-        }
+        if (profileVisibility !== undefined) user.privacySettings.profileVisibility = profileVisibility;
+        if (showEmail !== undefined) user.privacySettings.showEmail = showEmail;
+        if (showBio !== undefined) user.privacySettings.showBio = showBio;
 
         res.json(user.privacySettings);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+// --- Emergency & Alert Contact Management ---
+
+// GET /users/me/emergency-contacts - Get emergency contacts
+app.get('/users/me/emergency-contacts', authenticateToken, (req, res) => {
+    const user = users.find(u => u.id === req.user.id);
+    if (user) {
+        res.json(user.emergencyContactDetails);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+// PUT /users/me/emergency-contacts - Update emergency contacts
+app.put('/users/me/emergency-contacts', authenticateToken, (req, res) => {
+    const user = users.find(u => u.id === req.user.id);
+    if (user) {
+        const { emergencyContacts } = req.body;
+
+        // Basic validation
+        if (!Array.isArray(emergencyContacts)) {
+            return res.status(400).send('Request body must contain an emergencyContacts array.');
+        }
+
+        user.emergencyContactDetails = emergencyContacts;
+
+        res.json(user.emergencyContactDetails);
     } else {
         res.status(404).send('User not found');
     }

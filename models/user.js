@@ -11,7 +11,7 @@ class User {
         this.lastLoginAt = lastLoginAt;
         this.status = status;
         this.devicePushTokens = devicePushTokens;
-        this.emergencyContactDetails = emergencyContactDetails;
+        this.emergencyContactDetails = []; // Initialize as an empty array
         this.userAiProfileId = userAiProfileId;
 
         // Default privacy settings for a new user
