@@ -16,6 +16,26 @@ app.use(express.json());
 // In-memory "database"
 const users = [];
 
+// --- JWT Authentication Middleware ---
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer <TOKEN>
+
+    if (token == null) {
+        return res.sendStatus(401); // Unauthorized
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.sendStatus(403); // Forbidden
+        }
+        req.user = user;
+        next();
+    });
+};
+
+
 // --- Auth API Endpoints ---
 
 // POST /auth/register - Create a new user
@@ -26,7 +46,6 @@ app.post('/auth/register', (req, res) => {
         return res.status(400).send('Email, full name, and password are required.');
     }
 
-    // Check if user already exists
     if (users.some(user => user.email === email)) {
         return res.status(409).send('A user with this email already exists.');
     }
@@ -40,20 +59,11 @@ app.post('/auth/register', (req, res) => {
         passwordHash,
         salt,
         fullName,
-        null, // profilePictureUrl
-        new Date(),
-        new Date(),
-        null, // lastLoginAt
-        'pending_verification',
-        null, // devicePushTokens
-        null, // emergencyContactDetails
-        null  // userAiProfileId
+        null, null, null, 'pending_verification', null, null, null
     );
 
     users.push(newUser);
 
-    // For demonstration, we're returning a simplified user object.
-    // In a real app, you might just send a success message.
     res.status(201).json({ id: newUser.id, email: newUser.email, fullName: newUser.fullName });
 });
 
@@ -75,14 +85,49 @@ app.post('/auth/login', (req, res) => {
         return res.status(401).send('Invalid credentials.');
     }
 
-    // User is authenticated, create a JWT
     const accessToken = jwt.sign(
         { id: user.id, email: user.email },
         JWT_SECRET,
-        { expiresIn: '15m' } // Short-lived access token
+        { expiresIn: '15m' }
     );
 
     res.json({ accessToken });
+});
+
+
+// --- User Profile & Privacy Endpoints ---
+
+// GET /users/me/profile/privacy-settings - Get current privacy settings
+app.get('/users/me/profile/privacy-settings', authenticateToken, (req, res) => {
+    const user = users.find(u => u.id === req.user.id);
+    if (user) {
+        res.json(user.privacySettings);
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
+// PUT /users/me/profile/privacy-settings - Update privacy settings
+app.put('/users/me/profile/privacy-settings', authenticateToken, (req, res) => {
+    const user = users.find(u => u.id === req.user.id);
+    if (user) {
+        const { profileVisibility, showEmail, showBio } = req.body;
+
+        // Update only the settings that are provided in the request
+        if (profileVisibility !== undefined) {
+            user.privacySettings.profileVisibility = profileVisibility;
+        }
+        if (showEmail !== undefined) {
+            user.privacySettings.showEmail = showEmail;
+        }
+        if (showBio !== undefined) {
+            user.privacySettings.showBio = showBio;
+        }
+
+        res.json(user.privacySettings);
+    } else {
+        res.status(404).send('User not found');
+    }
 });
 
 

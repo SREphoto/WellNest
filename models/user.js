@@ -13,6 +13,13 @@ class User {
         this.devicePushTokens = devicePushTokens;
         this.emergencyContactDetails = emergencyContactDetails;
         this.userAiProfileId = userAiProfileId;
+
+        // Default privacy settings for a new user
+        this.privacySettings = {
+            profileVisibility: 'CONNECTIONS_ONLY', // Valid values: 'ALL_CONNECTIONS', 'CONNECTIONS_ONLY', 'PRIVATE'
+            showEmail: false,
+            showBio: true
+        };
     }
 }
 
