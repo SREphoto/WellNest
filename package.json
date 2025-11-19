@@ -1,0 +1,17 @@
+{
+  "name": "wellnest-web-app",
+  "version": "1.0.0",
+  "description": "A web application for the WellNest project.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^13.0.0"
+  }
+}
