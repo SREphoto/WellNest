@@ -48,6 +48,39 @@ app.post('/auth/register', (req, res) => {
     res.status(201).json({ id: newUser.id, email: newUser.email, fullName: newUser.fullName });
 });
 
+// POST /auth/login - Authenticate a user
+app.post('/auth/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).send('Email and password are required.');
+    }
+
+    const user = users.find(u => u.email === email);
+    if (!user) {
+        return res.status(401).send('Invalid email or password.');
+    }
+
+    const hash = crypto.pbkdf2Sync(password, user.salt, 1000, 64, 'sha512').toString('hex');
+    if (hash !== user.passwordHash) {
+        return res.status(401).send('Invalid email or password.');
+    }
+
+    // Update last login
+    user.lastLoginAt = new Date();
+
+    // Return user info (excluding sensitive data)
+    res.json({
+        message: 'Login successful',
+        user: {
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            status: user.status
+        }
+    });
+});
+
 
 app.get('/', (req, res) => {
   res.send('WellNest Web App is running!');
